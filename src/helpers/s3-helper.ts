@@ -34,16 +34,14 @@ export class S3Helper {
 
     try {
       const headCode = await this.client.headObject(params);
-      //console.log('Found. Code: ', headCode.$metadata.httpStatusCode);
       console.log(
         `${
           headCode.$metadata.httpStatusCode
-        }, ${new Date().toISOString()}:  ${url}`
+        }, ${new Date().toISOString()}: ${url}`
       );
 
       return true;
     } catch (err) {
-      //console.log('Error. Code: ', err.$metadata.httpStatusCode);
       console.log(
         `${err.$metadata.httpStatusCode}, ${new Date().toISOString()}: ${url}`
       );
@@ -65,5 +63,17 @@ export class S3Helper {
       ACL: "public-read",
       CacheControl: "max-age=31557600",
     });
+  }
+
+  // Function used for already existing thumbnails in case of resizing errors. Specific for my project only
+  getFallbackUrl(url: string, key: number = 400): string {
+    const parts = url.split("/");
+
+    parts[parts.length] = parts[parts.length - 1];
+    parts[parts.length - 2] = `thumbnails/${key}`;
+
+    const thumbnailPath = parts.join("/");
+
+    return `${this.basePath}${thumbnailPath}`;
   }
 }

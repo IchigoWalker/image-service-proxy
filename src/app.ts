@@ -59,12 +59,27 @@ app.get("*", validateMiddleware, async (req, res) => {
     );
     const thumbnailBaseName = basename(thumbnailName);
 
-    await ImageHelper.createThumbnail(
-      imageParams,
-      filePath,
-      thumbnailBaseName,
-      targetFolder
-    );
+    try {
+      await ImageHelper.createThumbnail(
+        imageParams,
+        filePath,
+        thumbnailBaseName,
+        targetFolder
+      );
+    } catch (err) {
+      console.log(err);
+      const fallbackUrl = s3Helper.getFallbackUrl(relativeUrl, 400);
+
+      res.redirect(301, fallbackUrl);
+
+      await Promise.all([
+        unlinkAsync(filePath),
+        unlinkAsync(`${targetFolder}/${thumbnailBaseName}`),
+      ]);
+      await rmdirAsync(targetFolder);
+
+      return;
+    }
 
     const stream = createReadStream(`${targetFolder}/${thumbnailBaseName}`);
 
