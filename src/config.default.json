@@ -1,0 +1,14 @@
+{
+  "amazon": {
+    "s3": {
+      "credentials": {
+        "key": "",
+        "secret": ""
+      },
+      "region": "eu-central-1",
+      "version": "latest",
+      "scheme": "https",
+      "bucket": ""
+    }
+  }
+}
